@@ -1,42 +1,45 @@
-import { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import authService from './appwrite/auth'
-import { login, logout } from './appwrite/authSlice'
-import './App.css'
-import Header from './components/Header/Header'
-import Footer from './components/Footer/Footer'
-import { Outlet } from 'react-router-dom'
+import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import authService from './appwrite/auth';
+import { login, logout } from './appwrite/authSlice';
+import './App.css';
+import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
+import { Outlet } from 'react-router-dom';
 
 function App() {
-  const [loading, setLoading] = useState(true)
-  const dispatch = useDispatch()
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    authService.getCurrentUser()
-      .then((user) => {
-        if (user) {
-          dispatch(login(user))
-        } 
-        else {
-          dispatch(logout());
-          }
-        })
-        .finally(() => setLoading(false))
-      }, [dispatch])
+    const checkAuth = async () => {
+      const user = await authService.getCurrentUser();
 
-  return !loading ? (
-    <>
-     <div className='min-h-screen flex flex-wrap content-between bg-gray-400'>
-      <div className='w-full block'>
-      <Header></Header>
-      <main>
-      Todo:  {/* <Outlet /> */}
-      </main>
-      <Footer></Footer>
+      if (user) {
+        dispatch(login(user));
+      } else {
+        dispatch(logout());
+      }
+
+      setLoading(false);
+    };
+
+    checkAuth();
+  }, [dispatch]);
+
+  if (loading) return null; // Optionally show a loading spinner here
+
+  return (
+    <div className="min-h-screen flex flex-wrap content-between bg-gray-400">
+      <div className="w-full block">
+        <Header />
+        <main>
+          <Outlet />
+        </main>
+        <Footer />
       </div>
-     </div>
-    </>
-  ) : null
+    </div>
+  );
 }
 
-export default App
+export default App;

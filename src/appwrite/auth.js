@@ -41,13 +41,15 @@ export class AuthService {
     async getCurrentUser() {
         try {
             const user = await this.account.get();
+            console.log('User fetched:', user);
             return user;
-        } 
-        catch (error) {
+        } catch (error) {
             if (error.code === 401) {
-                return null; // User is not authenticated
+                // Don't log 401 — it's normal if user isn't logged in
+                return null;
             }
-            throw new Error(`Failed to get current user: ${error.message}`);
+            console.error('Unexpected error in getCurrentUser():', error);
+            return null;
         }
     }
 
